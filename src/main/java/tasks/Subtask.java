@@ -1,25 +1,27 @@
+package tasks;
+
 import java.util.Objects;
 
 public class Subtask extends Task {
-    private int EpicId;
+    private int epicId;
 
-    public Subtask(String name, String description, int EpicId) {
+    public Subtask(String name, String description, int epicId) {
         super(name, description);
-        this.EpicId = EpicId;
+        this.epicId = epicId;
     }
 
     //еще один конструктор со статусом и id для удобства обновления подзадач
     public Subtask(String name, String description, String status, int id, int epicId) {
         super(name, description, status, id);
-        EpicId = epicId;
+        this.epicId = epicId;
     }
 
     public int getEpicId() {
-        return EpicId;
+        return epicId;
     }
 
     public void setEpicId(int epicId) {
-        EpicId = epicId;
+        this.epicId = epicId;
     }
 
     @Override
@@ -28,18 +30,18 @@ public class Subtask extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Subtask subtask = (Subtask) o;
-        return EpicId == subtask.EpicId;
+        return epicId == subtask.epicId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), EpicId);
+        return Objects.hash(super.hashCode(), epicId);
     }
 
     @Override
     public String toString() {
-        return "Subtask{" +
-                "EpicId=" + EpicId +
+        return "tasks.Subtask{" +
+                "epicId=" + epicId +
                 "} " + super.toString();
     }
 }

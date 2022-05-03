@@ -1,10 +1,11 @@
+package tasks;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
-    private ArrayList<Integer> subtaskIdList = new ArrayList<>(); /*список для хранения id подзадач. По рекомендации
-                                                                    наставника храним не объекты подзадач, а их id
-                                                                  */
+    //Список для хранения id подзадач. По рекомендации наставника храним не объекты подзадач, а их id
+    private ArrayList<Integer> subtaskIdList = new ArrayList<>();
 
     public Epic(String name, String description) {
         super(name, description);
@@ -16,6 +17,17 @@ public class Epic extends Task {
 
     public void setSubtaskIdList(ArrayList<Integer> subtaskIdList) {
         this.subtaskIdList = subtaskIdList;
+    }
+
+    public void deleteIdSubtaskList(Integer id) {
+        subtaskIdList.remove(id);
+        if (subtaskIdList.isEmpty()) {
+            setStatus("NEW");
+        }
+    }
+
+    public void addIdSubtaskList(Integer id) {
+        subtaskIdList.add(id);
     }
 
     @Override
@@ -34,7 +46,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
+        return "tasks.Epic{" +
                 "subtaskIdList=" + subtaskIdList +
                 "} " + super.toString();
     }
