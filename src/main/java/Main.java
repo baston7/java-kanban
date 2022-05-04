@@ -55,12 +55,5 @@ public class Main {  // метод для тестирования програ�
         System.out.println(list);
         ArrayList<Subtask> list2 = taskManager.getSubtaskByEpic(epic2);
         System.out.println(list2);
-        //Выводим в консоль Hashmaps эпиков и подзадач
-        System.out.println(taskManager.epicMap);
-        System.out.println(taskManager.subtaskMap);
-        //Удаляем эпик и снова выводим в консоль Hashmaps
-        taskManager.deleteByIdEpic(epic2.getId());
-        System.out.println(taskManager.epicMap);
-        System.out.println(taskManager.subtaskMap);
     }
 }

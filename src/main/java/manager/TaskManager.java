@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
-    public HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
-    public HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
-    public HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
-    int id = 0;  //Переменная для получения id
+    private HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
+    private HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
+    private HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
+    private int id = 0;  //Переменная для получения id
 
     public Integer createTask(Task task) {  //метод создания задач
         task.setId(++id);
