@@ -22,7 +22,7 @@ public class Epic extends Task {
     public void deleteIdSubtaskList(Integer id) {
         subtaskIdList.remove(id);
         if (subtaskIdList.isEmpty()) {
-            setStatus("NEW");
+            setStatus(Status.NEW);
         }
     }
 
