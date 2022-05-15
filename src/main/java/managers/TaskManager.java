@@ -2,7 +2,7 @@ package managers;
 
 import tasks.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
 
@@ -12,11 +12,11 @@ public interface TaskManager {
 
     Integer createEpic(Epic epic);   //метод создания эпиков
 
-    ArrayList<Task> getAllTask();     //метод получения списка всех задач
+    List<Task> getAllTask();     //метод получения списка всех задач
 
-    ArrayList<Subtask> getAllSubtask();     //метод получения списка всех подзадач
+    List<Subtask> getAllSubtask();     //метод получения списка всех подзадач
 
-    ArrayList<Epic> getAllEpic();   //метод получения списка всех эпиков
+    List<Epic> getAllEpic();   //метод получения списка всех эпиков
 
     void deleteTucks();//метод удаления всех задач
 
@@ -42,5 +42,6 @@ public interface TaskManager {
 
     void deleteByIdEpic(Integer id); //метод удаления эпика по id
 
-    ArrayList<Subtask> getSubtaskByEpic(Epic epic);//Метод для получения списка всех подзадач определённого эпика
+    List<Subtask> getSubtaskByEpic(Epic epic);//Метод для получения списка всех подзадач определённого эпика
+    List<Task> getHistory();
 }

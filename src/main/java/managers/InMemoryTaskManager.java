@@ -5,17 +5,18 @@ import utilits.Managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
-    private HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
-    private HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
-    private HistoryManager historyManager = Managers.getDefaultHistory();
+    private final HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
+    private final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
+    private final HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
     private int id = 0;  //Переменная для получения id
 
     @Override
     public Integer createTask(Task task) {  //метод создания задач
-        task.setId(++id);
+        task.setId(generationId());
         task.setStatus(Status.NEW);
         taskMap.put(task.getId(), task);
         return id;
@@ -24,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Integer createSubtask(Subtask subtask) { //метод создания подзадач
         if (epicMap.containsKey(subtask.getEpicId())) {
-            subtask.setId(++id);
+            subtask.setId(generationId());
             subtask.setStatus(Status.NEW);
             subtaskMap.put(subtask.getId(), subtask);
             Epic epic = epicMap.get(subtask.getEpicId());// достаем Эпик чтобы записать в него id подзадачи
@@ -40,7 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer createEpic(Epic epic) {   //метод создания эпиков
-        epic.setId(++id);
+        epic.setId(generationId());
         epic.setStatus(Status.NEW);
         epicMap.put(epic.getId(), epic);
         return id;
@@ -48,41 +49,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Task> getAllTask() {     //метод получения списка всех задач
-        if (!taskMap.isEmpty()) {
-            ArrayList<Task> tasks = new ArrayList<>();
-            for (Task task : taskMap.values()) {
-                tasks.add(task);
-            }
-            return tasks;
-        } else {
-            return null;
-        }
+        return new ArrayList<>(taskMap.values());
     }
 
     @Override
     public ArrayList<Subtask> getAllSubtask() {     //метод получения списка всех подзадач
-        if (!subtaskMap.isEmpty()) {
-            ArrayList<Subtask> subtasks = new ArrayList<>();
-            for (Subtask subtask : subtaskMap.values()) {
-                subtasks.add(subtask);
-            }
-            return subtasks;
-        } else {
-            return null;
-        }
+        return new ArrayList<>(subtaskMap.values());
     }
 
     @Override
     public ArrayList<Epic> getAllEpic() {     //метод получения списка всех эпиков
-        if (!epicMap.isEmpty()) {
-            ArrayList<Epic> epics = new ArrayList<>();
-            for (Epic epic : epicMap.values()) {
-                epics.add(epic);
-            }
-            return epics;
-        } else {
-            return null;
-        }
+        return new ArrayList<>(epicMap.values());
     }
 
     @Override
@@ -107,35 +84,23 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(int id) { //метод получения задачи по id
-        if (taskMap.containsKey(id)) {
-            //тк размер списка не должен превышать 10 элементов, то постоянно это отслеживаем и удаляем лишний элемент
-            historyManager.add(taskMap.get(id));
-            return taskMap.get(id);
-        } else {
-            return null;
-        }
+        var task = taskMap.get(id);
+        historyManager.add(task);
+        return task;
     }
 
     @Override
     public Subtask getSubtaskById(int id) {//метод получения подзадачи по id
-        if (subtaskMap.containsKey(id)) {
-            //тк размер списка не должен превышать 10 элементов, то постоянно это отслеживаем и удаляем лишний элемент
-            historyManager.add(subtaskMap.get(id));
-            return subtaskMap.get(id);
-        } else {
-            return null;
-        }
+        var task = subtaskMap.get(id);
+        historyManager.add(task);
+        return task;
     }
 
     @Override
     public Epic getEpicById(int id) { //метод получения эпика по id
-        if (epicMap.containsKey(id)) {
-            //тк размер списка не должен превышать 10 элементов, то постоянно это отслеживаем и удаляем лишний элемент
-            historyManager.add(epicMap.get(id));
-            return epicMap.get(id);
-        } else {
-            return null;
-        }
+        var task = epicMap.get(id);
+        historyManager.add(task);
+        return task;
     }
 
     @Override
@@ -217,6 +182,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
     private void epicUpdateStatus(Epic epic) {
         ArrayList<Integer> subtaskIdList = epic.getSubtaskIdList();
         if (subtaskIdList.size() == 0) { // если список пустой, то устанавливаем статус NEW на эпик
@@ -240,5 +210,9 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.setStatus(Status.NEW);
             }
         }
+    }
+
+    private Integer generationId() {
+        return ++id;
     }
 }

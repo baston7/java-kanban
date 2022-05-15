@@ -4,7 +4,7 @@ import tasks.Status;
 import tasks.*;
 import utilits.Managers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Main {  // метод для тестирования программы
     public static void main(String[] args) {
@@ -55,9 +55,9 @@ public class Main {  // метод для тестирования програ�
         taskManager.deleteByIdSubtask(subtask2.getId());
         System.out.println(epic);
         //Получаем списки и выводим их в консоль для всех подзадач и подзадач для эпика
-        ArrayList<Subtask> list = taskManager.getAllSubtask();
+        List<Subtask> list = taskManager.getAllSubtask();
         System.out.println(list);
-        ArrayList<Subtask> list2 = taskManager.getSubtaskByEpic(epic2);
+        List<Subtask> list2 = taskManager.getSubtaskByEpic(epic2);
         System.out.println(list2);
         //Проверка получения списка просмотров.
         Task task3 = new Task("Починить велосипед", "Съездить в сервис");
@@ -81,7 +81,6 @@ public class Main {  // метод для тестирования програ�
         taskManager.getEpicById(taskManager.createEpic(epic9));
         taskManager.getEpicById(taskManager.createEpic(epic10));
         taskManager.getEpicById(taskManager.createEpic(epic10));
-        System.out.println(historyManager.getHistory());
-
+        System.out.println(taskManager.getHistory());
     }
 }
