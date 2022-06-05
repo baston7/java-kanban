@@ -64,6 +64,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTucks() { //метод удаления всех задач
+        for (Integer id : taskMap.keySet()) {
+            historyManager.remove(id);
+        }
         taskMap.clear();
     }
 
@@ -77,7 +80,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteEpics() {  //метод удаления всех эпиков
+    public void deleteEpics() {//метод удаления всех эпиков
+        for (Integer id : epicMap.keySet()) {
+            historyManager.remove(id);
+        }
         epicMap.clear();
         subtaskMap.clear(); //Удаляем все подзадачи тоже, тк они не могут существовать без Эпиков
     }
@@ -139,6 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteByIdTask(Integer id) { //метод удаления задачи по id
         if (taskMap.containsKey(id)) {
+            historyManager.remove(id);
             taskMap.remove(id);
         }
     }
@@ -162,6 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (Integer idSubtask : subtaskIdList) {
                 subtaskMap.remove(idSubtask);
             }
+            historyManager.remove(id);
             epicMap.remove(id); //удаляем эпик
         }
     }
