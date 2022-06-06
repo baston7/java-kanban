@@ -1,4 +1,4 @@
-package CustomNodes;
+package customs;
 
 import tasks.Task;
 

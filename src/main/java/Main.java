@@ -36,5 +36,8 @@ public class Main {  // метод для тестирования програ�
         taskManager.getEpicById(epic2.getId());
         taskManager.deleteByIdEpic(epic.getId());
         System.out.println(taskManager.getHistory());
+        taskManager.getTaskById(task1.getId());
+        System.out.println(taskManager.getHistory());
+        System.out.println(taskManager.getHistory());
     }
 }

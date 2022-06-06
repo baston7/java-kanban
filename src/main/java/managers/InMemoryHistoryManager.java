@@ -1,6 +1,6 @@
 package managers;
 
-import CustomNodes.Node;
+import customs.Node;
 import tasks.Task;
 
 import java.util.ArrayList;
@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static final List<Task> historyList = new ArrayList<>();
-    private static final Map<Integer, Node> historyMap = new HashMap<>();// хэш мап для удаления повторных просмотров
+    private final Map<Integer, Node> historyMap = new HashMap<>();// хэш мап для удаления повторных просмотров
     private Node head;
     private Node tail;
 
@@ -20,24 +19,28 @@ public class InMemoryHistoryManager implements HistoryManager {
         tail = newNode;
         if (oldTail == null) {
             head = newNode;
-            historyMap.put(task.getId(), head);
         } else {
             oldTail.setNext(newNode);
-            historyMap.put(task.getId(), newNode);
         }
+        historyMap.put(task.getId(), newNode);
     }
 
-    private void getTasks() {
+    private List<Task> getTasks() {
+        final List<Task> historyList = new ArrayList<>();
         Node currentNode = head;
         while (currentNode != null) {
             historyList.add(currentNode.getTask());
             currentNode = currentNode.getNext();
         }
+        return historyList;
     }
 
 
     private void removeNode(Node node) {
-        if (node.getPrev() == null) {
+        if (node.getPrev() == null && node.getNext() == null) {
+            head = null;
+            tail = null;
+        } else if (node.getPrev() == null) {
             head = head.getNext();
             head.setPrev(null);
         } else if (node.getNext() == null) {
@@ -70,7 +73,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        getTasks();
-        return historyList;
+        return getTasks();
     }
 }
