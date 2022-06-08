@@ -39,5 +39,10 @@ public class Main {  // метод для тестирования програ�
         taskManager.getTaskById(task1.getId());
         System.out.println(taskManager.getHistory());
         System.out.println(taskManager.getHistory());
+        Task task3 = new Task("Оформить отпуск", "согласовать отпускную записку");
+        taskManager.createTask(task3);
+        taskManager.deleteByIdTask(task3.getId());
+        taskManager.getTaskById(task3.getId());
+        System.out.println(taskManager.getHistory());
     }
 }
