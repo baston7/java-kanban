@@ -43,6 +43,7 @@ public class Main {  // метод для тестирования програ�
         taskManager.createTask(task3);
         taskManager.deleteByIdTask(task3.getId());
         taskManager.getTaskById(task3.getId());
+        taskManager.getSubtaskById(subtask2.getId());
         System.out.println(taskManager.getHistory());
     }
 }

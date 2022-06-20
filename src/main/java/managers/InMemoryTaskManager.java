@@ -8,11 +8,27 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
-    private final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
-    private final HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
+    private static final HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
+    private static final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
+    private static final HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
     private final HistoryManager historyManager = Managers.getDefaultHistory();
-    private int id = 0;  //Переменная для получения id
+    private static int id = 0;  //Переменная для получения id
+
+    public static HashMap<Integer, Task> getTaskMap() {
+        return taskMap;
+    }
+
+    public static HashMap<Integer, Subtask> getSubtaskMap() {
+        return subtaskMap;
+    }
+
+    public static HashMap<Integer, Epic> getEpicMap() {
+        return epicMap;
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
 
     @Override
     public Integer createTask(Task task) {  //метод создания задач
@@ -63,7 +79,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTucks() { //метод удаления всех задач
+    public void deleteTasks() { //метод удаления всех задач
         for (Integer id : taskMap.keySet()) {
             historyManager.remove(id);
         }
@@ -76,6 +92,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Epic epic : epicMap.values()) {  //Удаляем все id из Эпиков
             ArrayList<Integer> subtaskIdList = epic.getSubtaskIdList();
             subtaskIdList.clear();
+            historyManager.remove(id);
         }
     }
 
@@ -157,6 +174,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epicMap.get(subtask.getEpicId());
             epic.deleteIdSubtaskList(id);
             epicUpdateStatus(epic);
+            historyManager.remove(id);
             subtaskMap.remove(id);//удаляем подзадачу
         }
     }

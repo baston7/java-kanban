@@ -18,7 +18,7 @@ public interface TaskManager {
 
     List<Epic> getAllEpic();   //метод получения списка всех эпиков
 
-    void deleteTucks();//метод удаления всех задач
+    void deleteTasks();//метод удаления всех задач
 
     void deleteSubtasks(); //метод удаления всех подзадач
 
