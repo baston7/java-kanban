@@ -8,26 +8,27 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static final HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
-    private static final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
-    private static final HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
+    private final HashMap<Integer, Task> taskMap = new HashMap<>();   // Хэшмап для хранения обычных задач
+    private final HashMap<Integer, Subtask> subtaskMap = new HashMap<>();    //Хэшмап для хранения подзадач
+    private final HashMap<Integer, Epic> epicMap = new HashMap<>();    //Хэшмап для хранения эпиков
     private final HistoryManager historyManager = Managers.getDefaultHistory();
-    private static int id = 0;  //Переменная для получения id
-
-    public static HashMap<Integer, Task> getTaskMap() {
-        return taskMap;
-    }
-
-    public static HashMap<Integer, Subtask> getSubtaskMap() {
-        return subtaskMap;
-    }
-
-    public static HashMap<Integer, Epic> getEpicMap() {
-        return epicMap;
-    }
+    private int id = 0;  //Переменная для получения id
 
     public HistoryManager getHistoryManager() {
         return historyManager;
+    }
+
+    //метод для добавления задач в приватные поля при восстановлении из файла
+    protected void addRecoverTask(Task task) {
+        if (task != null && task.getId() != 0) {
+            if (task instanceof Subtask) {
+                subtaskMap.put(task.getId(), (Subtask) task);
+            } else if (task instanceof Epic) {
+                epicMap.put(task.getId(), (Epic) task);
+            } else {
+                taskMap.put(task.getId(), task);
+            }
+        }
     }
 
     @Override
@@ -64,17 +65,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getAllTask() {     //метод получения списка всех задач
+    public List<Task> getAllTask() {     //метод получения списка всех задач
         return new ArrayList<>(taskMap.values());
     }
 
     @Override
-    public ArrayList<Subtask> getAllSubtask() {     //метод получения списка всех подзадач
+    public List<Subtask> getAllSubtask() {     //метод получения списка всех подзадач
         return new ArrayList<>(subtaskMap.values());
     }
 
     @Override
-    public ArrayList<Epic> getAllEpic() {     //метод получения списка всех эпиков
+    public List<Epic> getAllEpic() {     //метод получения списка всех эпиков
         return new ArrayList<>(epicMap.values());
     }
 
@@ -90,7 +91,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteSubtasks() { //метод удаления всех подзадач
         subtaskMap.clear();
         for (Epic epic : epicMap.values()) {  //Удаляем все id из Эпиков
-            ArrayList<Integer> subtaskIdList = epic.getSubtaskIdList();
+            List<Integer> subtaskIdList = epic.getSubtaskIdList();
             subtaskIdList.clear();
             historyManager.remove(id);
         }
@@ -193,10 +194,10 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Subtask> getSubtaskByEpic(Epic epic) {//Метод для получения списка всех подзадач определённого эпика
+    public List<Subtask> getSubtaskByEpic(Epic epic) {//Метод для получения списка всех подзадач определённого эпика
         if (epicMap.containsKey(epic.getId())) {
-            ArrayList<Subtask> subtasks = new ArrayList<>();
-            ArrayList<Integer> subtaskIdList = epic.getSubtaskIdList();
+            List<Subtask> subtasks = new ArrayList<>();
+            List<Integer> subtaskIdList = epic.getSubtaskIdList();
             if (!subtaskIdList.isEmpty()) {
                 for (Integer id : subtaskIdList) {
                     subtasks.add(subtaskMap.get(id));
@@ -214,7 +215,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void epicUpdateStatus(Epic epic) {
-        ArrayList<Integer> subtaskIdList = epic.getSubtaskIdList();
+        List<Integer> subtaskIdList = epic.getSubtaskIdList();
         if (subtaskIdList.size() == 0) { // если список пустой, то устанавливаем статус NEW на эпик
             epic.setStatus(Status.NEW);
         } else {
