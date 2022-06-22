@@ -221,7 +221,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 if (i != splitLine.length - 1) {
                     manager.addRecoverTask(fromString(splitLine[i]));
                 } else {
-                    //добавляем для всех эпиков id подзадач, тк по условию в файле нет четкого порядка
+                    // добавляем для всех эпиков id подзадач, тк по условию в файле нет четкого порядка
                     if (!manager.getAllSubtask().isEmpty()) {
                         for (Subtask subtask : manager.getAllSubtask()) {
                             for (Epic epic : manager.getAllEpic()) {
@@ -231,7 +231,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                             }
                         }
                     }
-                    //обрабатываем последнюю строку для истории просмотров задач
+                    // обрабатываем последнюю строку для истории просмотров задач
                     List<Integer> idTasks = fromLastString(splitLine[splitLine.length - 1]);
                     for (Integer id : idTasks) {
                         manager.getTaskById(id);

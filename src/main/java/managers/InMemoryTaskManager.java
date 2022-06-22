@@ -18,7 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager;
     }
 
-    //метод для добавления задач в приватные поля при восстановлении из файла
+    // метод для добавления задач в приватные поля при восстановлении из файла
     protected void addRecoverTask(Task task) {
         if (task != null && task.getId() != 0) {
             if (task instanceof Subtask) {
