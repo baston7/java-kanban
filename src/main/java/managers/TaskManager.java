@@ -3,6 +3,7 @@ package managers;
 import tasks.*;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
 
@@ -44,4 +45,5 @@ public interface TaskManager {
 
     List<Subtask> getSubtaskByEpic(Epic epic);//Метод для получения списка всех подзадач определённого эпика
     List<Task> getHistory();
+    Set<Task> getPrioritizedTasks();
 }

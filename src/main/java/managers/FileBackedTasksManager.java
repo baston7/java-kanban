@@ -4,43 +4,14 @@ import customs.ManagerSaveException;
 import tasks.*;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private File file;
-
-    public static void main(String[] args) {
-        FileBackedTasksManager backedTasksManager = new FileBackedTasksManager(new File("book.csv"));
-        Task task = new Task("Купить цветы", "Купить цветы девушке на др ");
-        Task task1 = new Task("Починить авто", "Съездить в сервис");
-        backedTasksManager.createTask(task);
-        backedTasksManager.createTask(task1);
-        //Создаем первый эпик и подзадачи для него
-        Epic epic = new Epic("Бег", "выполнить цель по км за месяц ");
-        backedTasksManager.createEpic(epic);
-        Subtask subtask = new Subtask("1 и 2 недели бег", "пробежать в сумме 60 км", epic.getId());
-        backedTasksManager.createSubtask(subtask);
-        Subtask subtask2 = new Subtask("3  неделя бега", "пробежать в сумме 80 км", epic.getId());
-        backedTasksManager.createSubtask(subtask2);
-        Subtask subtask3 = new Subtask("4  неделя бега", "пробежать в сумме 100 км", epic.getId());
-        backedTasksManager.createSubtask(subtask3);
-        //создаем второй эпик без подзадач
-        Epic epic2 = new Epic("Подтягивания", "Выполнить 20 подтягиваний за раз");
-        backedTasksManager.createEpic(epic2);
-        backedTasksManager.getTaskById(task.getId());
-        backedTasksManager.getTaskById(task1.getId());
-        backedTasksManager.getEpicById(epic.getId());
-        backedTasksManager.getEpicById(epic2.getId());
-        backedTasksManager.getSubtaskById(subtask.getId());
-        backedTasksManager.getSubtaskById(subtask3.getId());
-        FileBackedTasksManager manager2 = loadFromFile(new File("book.csv"));
-        List<Task> historyList = manager2.getHistory();
-        List<Task> taskList = manager2.getAllTask();
-        List<Subtask> subtaskList = manager2.getAllSubtask();
-        List<Epic> epicList = manager2.getAllEpic();
-    }
 
     public FileBackedTasksManager(File file) {
         if (file != null) {
@@ -73,6 +44,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void deleteTasks() {
         super.deleteTasks();
         save();
+    }
+
+    @Override
+    public Set<Task> getPrioritizedTasks() {
+        return super.getPrioritizedTasks();
     }
 
     @Override
@@ -146,7 +122,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     private void save() {
         try (FileWriter filewriter = new FileWriter(file)) {
-            filewriter.write("id,type,name,status,description,epic\n");
+            filewriter.write("id,type,name,status,description,epic,duration,StartTime,EndTime\n");
             for (Task task : getAllTask()) {
                 filewriter.write(task.toString());
             }
@@ -167,16 +143,41 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         if (value != null && !value.isBlank() && !value.isEmpty()) {
             String[] splitTasks = value.split(",");
             if (TaskType.valueOf(splitTasks[1]).equals(TaskType.TASK)) {
+
                 Task task = new Task(splitTasks[2], splitTasks[4], Status.valueOf(splitTasks[3]),
-                        Integer.parseInt(splitTasks[0]));
+                        Long.parseLong(splitTasks[5]));
+                task.setId(Integer.parseInt(splitTasks[0]));
+                if (splitTasks[6].equals("null") && splitTasks[7].equals("null")) {
+                    task.setStartTime(null);
+                    task.setEndTime(null);
+                } else {
+                    task.setStartTime(LocalDateTime.parse(splitTasks[6]));
+                    task.getEndTime();
+                }
                 return task;
             } else if (TaskType.valueOf(splitTasks[1]).equals(TaskType.SUBTASK)) {
                 Subtask subtask = new Subtask(splitTasks[2], splitTasks[4], Status.valueOf(splitTasks[3]),
-                        Integer.parseInt(splitTasks[0]), Integer.parseInt(splitTasks[5]));
+                        Long.parseLong(splitTasks[6]), Integer.parseInt(splitTasks[5]));
+                subtask.setId(Integer.parseInt(splitTasks[0]));
+                if (splitTasks[7].equals("null") && splitTasks[8].equals("null")) {
+                    subtask.setStartTime(null);
+                    subtask.setEndTime(null);
+                } else {
+                    subtask.setStartTime(LocalDateTime.parse(splitTasks[7]));
+                    subtask.setEndTime(LocalDateTime.parse(splitTasks[8]));
+                }
                 return subtask;
             } else if (TaskType.valueOf(splitTasks[1]).equals(TaskType.EPIC)) {
                 Epic epic = new Epic(splitTasks[2], splitTasks[4], Status.valueOf(splitTasks[3]),
                         Integer.parseInt(splitTasks[0]));
+                epic.setDuration(Long.parseLong(splitTasks[5]));
+                if (splitTasks[6].equals("null") && splitTasks[7].equals("null")) {
+                    epic.setStartTime(null);
+                    epic.setEndTimeEpic(null);
+                } else {
+                    epic.setStartTime(LocalDateTime.parse(splitTasks[6]));
+                    epic.setEndTimeEpic(LocalDateTime.parse(splitTasks[7]));
+                }
                 return epic;
             }
         }
@@ -218,7 +219,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             }
             String[] splitLine = result.split("\n");
             for (int i = 1; i < splitLine.length; i++) {
-                if (i != splitLine.length - 1) {
+                if (!splitLine[i].isEmpty() && !splitLine[i - 1].isEmpty()) {
                     manager.addRecoverTask(fromString(splitLine[i]));
                 } else {
                     // добавляем для всех эпиков id подзадач, тк по условию в файле нет четкого порядка
@@ -231,12 +232,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                             }
                         }
                     }
+
                     // обрабатываем последнюю строку для истории просмотров задач
-                    List<Integer> idTasks = fromLastString(splitLine[splitLine.length - 1]);
-                    for (Integer id : idTasks) {
-                        manager.getTaskById(id);
-                        manager.getEpicById(id);
-                        manager.getSubtaskById(id);
+                    if (!splitLine[splitLine.length - 1].isEmpty() && splitLine[splitLine.length - 2].isEmpty()) {
+                        List<Integer> idTasks = fromLastString(splitLine[splitLine.length - 1]);
+                        if (idTasks != null) {
+                            for (Integer id : idTasks) {
+                                manager.getTaskById(id);
+                                manager.getEpicById(id);
+                                manager.getSubtaskById(id);
+                            }
+                        }
                     }
                 }
             }
