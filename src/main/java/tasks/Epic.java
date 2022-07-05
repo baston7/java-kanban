@@ -1,5 +1,7 @@
 package tasks;
 
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -35,7 +37,8 @@ public class Epic extends Task {
         subtaskIdList.add(id);
     }
 
-    public void setEndTimeEpic(LocalDateTime endTimeEpic) {
+    @Override
+    public void setEndTime(LocalDateTime endTimeEpic) {
         this.endTimeEpic = endTimeEpic;
     }
 
@@ -46,9 +49,15 @@ public class Epic extends Task {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Epic)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Epic)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
 
         Epic epic = (Epic) o;
 

@@ -16,20 +16,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     public T taskManager;
-
     abstract T createTaskManager();
 
     @BeforeEach
     public void updateTaskManager() {
         taskManager = createTaskManager();
+        Task task23 = new Task("Купить цветы", "Купить цветы девушке на др ", 215,
+                LocalDateTime.of(2022, 11, 22, 10, 22));
     }
 
     @Test
     public void testCreateTask() {
         Task task = new Task("Купить цветы", "Купить цветы девушке на др ", 215,
                 LocalDateTime.of(2022, 11, 22, 10, 22));
+
         int id = taskManager.createTask(task);
         int idTaskInMap = taskManager.getAllTask().get(0).getId();
+
         assertEquals(1, id, "Метод не возвращает id задачи");
         assertEquals(1, idTaskInMap, "Метод не добавил задачу в хэшмап для хранения задач");
 
@@ -40,12 +43,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
     public void testCreateSubtask() {
         Epic epic = new Epic("Бег", "выполнить цель по км за месяц ");
         taskManager.createEpic(epic);
+
         int idSubtask = taskManager.createSubtask(new Subtask("1 и 2 недели бег",
                 "пробежать в сумме 60 км", 30,
                 LocalDateTime.of(2022, 11, 22, 10, 22), epic.getId()));
+
         int idSubtaskInMap = taskManager.getAllSubtask().get(0).getId();
         int idSubtaskInEpic = taskManager.getAllEpic().get(0).getSubtaskIdList().get(0);
         int idEpicInSubtask = taskManager.getAllSubtask().get(0).getEpicId();
+
         assertEquals(1, idEpicInSubtask, "Метод не добавил id Epic в Subtask");
         assertEquals(2, idSubtask, "Метод не возвращает id подзадачи");
         assertEquals(2, idSubtaskInEpic, "Метод не добавил id подзадачи в Epic");
@@ -56,8 +62,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void testCreateEpic() {
         Epic epic = new Epic("Бег", "выполнить цель по км за месяц ");
+
         int idEpic = taskManager.createEpic(epic);
         int idEpicInMap = taskManager.getAllEpic().get(0).getId();
+
         assertEquals(1, idEpic, "Метод не возвращает id эпика");
         assertEquals(1, idEpicInMap, "Метод не добавил эпик в хэшмап для хранения эпиков");
     }
@@ -67,11 +75,32 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task task = new Task("Купить цветы", "Купить цветы девушке на др ", 45);
         Task task1 = new Task("Починить авто", "Съездить в сервис",
                 60, LocalDateTime.of(2022, 5, 22, 10, 22));
+
         boolean empty = taskManager.getAllTask().isEmpty();
         assertTrue(empty, "При несозданных задачах метод должен возвращать пустой список");
+
         taskManager.createTask(task);
         taskManager.createTask(task1);
+
         int sizeList = taskManager.getAllTask().size();
+        assertEquals(2, sizeList, "Отсутсвуют задачи в возвращаемом методом List ");
+    }
+    @Test
+    public void testGetAllSubtask() {
+
+        boolean empty = taskManager.getAllSubtask().isEmpty();
+        assertTrue(empty, "При несозданных задачах метод должен возвращать пустой список");
+        Epic epic = new Epic("Бег", "выполнить цель по км за месяц ");
+
+        taskManager.createEpic(epic);
+        taskManager.createSubtask(new Subtask("1 и 2 недели бег", "пробежать в сумме 60 км",
+                60,
+                epic.getId()));
+        taskManager.createSubtask(new Subtask("3 и 4 недели бег", "пробежать в сумме 80 км",
+                50,
+                epic.getId()));
+
+        int sizeList = taskManager.getAllSubtask().size();
         assertEquals(2, sizeList, "Отсутсвуют задачи в возвращаемом методом List ");
     }
 
@@ -90,17 +119,23 @@ abstract class TaskManagerTest<T extends TaskManager> {
     public void testDeleteTasks() {
         Task task = new Task("Купить цветы", "Купить цветы девушке на др ", 50);
         Task task1 = new Task("Починить авто", "Съездить в сервис", 56);
+
         taskManager.createTask(task);
         taskManager.createTask(task1);
+
         taskManager.getTaskById(task.getId());
         taskManager.getTaskById(task1.getId());
+
         int sizeHistoryList = taskManager.getHistory().size();
         boolean empty = taskManager.getAllTask().isEmpty();
+
         assertFalse(empty, "При cозданных задачах список не должен быть пуст");
         assertEquals(2, sizeHistoryList, "Неверно отображается количество просмотренных задач");
+
         taskManager.deleteTasks();
         boolean empty2 = taskManager.getAllTask().isEmpty();
         int sizeHistoryList2 = taskManager.getHistory().size();
+
         assertTrue(empty2, "После вызова метода список задач должен быть пуст");
         assertEquals(0, sizeHistoryList2, "Количество просмотренных задач должно быть равно 0");
     }
@@ -115,15 +150,20 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int id2 = taskManager.createSubtask(new Subtask("3 и 4 недели бег", "пробежать в сумме 80 км",
                 50,
                 epic.getId()));
+
         taskManager.getSubtaskById(id);
         taskManager.getSubtaskById(id2);
+
         boolean empty = taskManager.getAllSubtask().isEmpty();
         int sizeHistoryList = taskManager.getHistory().size();
+
         assertFalse(empty, "При cозданных подзадачах список не должен быть пуст");
         assertEquals(2, sizeHistoryList, "Неверно отображается количество просмотренных подзадач");
+
         taskManager.deleteSubtasks();
         boolean empty2 = taskManager.getAllSubtask().isEmpty();
         int sizeHistoryList2 = taskManager.getHistory().size();
+
         assertTrue(empty2, "После вызова метода список подзадач должен быть пуст");
         assertEquals(0, sizeHistoryList2, "Количество просмотренных подзадач должно быть равно 0");
     }
@@ -131,22 +171,30 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void testDeleteEpics() {
         Epic epic = new Epic("Бег", "выполнить цель по км за месяц ");
+
         taskManager.createEpic(epic);
         taskManager.createSubtask(new Subtask("1 и 2 недели бег", "пробежать в сумме 60 км", 55,
                 epic.getId()));
         taskManager.createSubtask(new Subtask("3 и 4 недели бег", "пробежать в сумме 80 км", 45,
                 epic.getId()));
+
         taskManager.getEpicById(epic.getId());
         boolean isEmpty = taskManager.getAllEpic().isEmpty();
         boolean isEmpty2 = taskManager.getAllSubtask().isEmpty();
+
         int sizeHistoryList = taskManager.getHistory().size();
+
         assertFalse(isEmpty, "При cозданных эпиках, их список не должен быть пуст");
         assertFalse(isEmpty2, "При cозданных эпиках c подзадачами список подзадач не должен быть пуст");
         assertEquals(1, sizeHistoryList, "Неверно отображается количество просмотренных эпиков");
+
         taskManager.deleteEpics();
+
         boolean isEmpty3 = taskManager.getAllEpic().isEmpty();
         boolean isEmpty4 = taskManager.getAllSubtask().isEmpty();
+
         int sizeHistoryList2 = taskManager.getHistory().size();
+
         assertTrue(isEmpty3, "После вызова метода список эпиков должен быть пуст");
         assertTrue(isEmpty4, "После вызова метода список подзадач должен быть пуст");
         assertEquals(0, sizeHistoryList2, "Количество просмотренных подзадач должно быть равно 0");
@@ -182,6 +230,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(0, sizeHistoryList, "Cписок просмотренных задач должен быть пуст");
         Subtask subtask2 = taskManager.getSubtaskById(subtask1.getId());
         int sizeHistoryList2 = taskManager.getHistory().size();
+
         assertEquals(1, sizeHistoryList2, "Размер списка просмотренных задач должен соответствовать" +
                 " количеству просмотренных задач");
         assertEquals(subtask1, subtask2, "Ошибка при получении подзадачи");
@@ -197,6 +246,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(0, sizeHistoryList, "Cписок просмотренных задач должен быть пуст");
         Epic epic3 = taskManager.getEpicById(epic2.getId());
         int sizeHistoryList2 = taskManager.getHistory().size();
+
         assertEquals(1, sizeHistoryList2, "Размер списка просмотренных подзадач должен соответствовать" +
                 " количеству просмотренных задач");
         assertEquals(epic2, epic3, "Ошибка при получении подзадачи");
@@ -207,13 +257,17 @@ abstract class TaskManagerTest<T extends TaskManager> {
     public void testUpdateTask() {
         Task task = new Task("Купить цветы", "Купить цветы девушке на др ", 76);
         Task task2 = new Task("Оформить отпуск", "согласовать отпускную записку", Status.IN_PROGRESS);
+
         taskManager.createTask(task);
         taskManager.updateTask(task2, 44);
+
         assertEquals("Купить цветы", task.getName(), "Имя задачи не должно измениться");
         assertEquals("Купить цветы девушке на др ", task.getDescription(),
                 "Описание задачи не должно измениться");
         assertEquals(Status.NEW, task.getStatus(), "Статус не должен измениться");
+
         taskManager.updateTask(task2, 1);
+
         assertEquals("Оформить отпуск", task.getName(), "Имя задачи должно измениться");
         assertEquals("согласовать отпускную записку", task.getDescription(),
                 "Описание задачи должно измениться");
@@ -225,6 +279,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     public void testUpdateSubtask() {
         Epic epic = new Epic("Бег", "выполнить цель по км за месяц ");
         taskManager.createEpic(epic);
+
         Subtask subtask1 = new Subtask("1  неделя бег", "пробежать в сумме 60 км",
                 45, epic.getId());
         Subtask subtask2 = new Subtask("2 неделя  бег", "пробежать в сумме 80 км",
@@ -232,14 +287,18 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
+
         Subtask subtask3 = new Subtask("3 неделя  бег", "пробежать в сумме 100 км", Status.IN_PROGRESS,
                 30, epic.getId());
         taskManager.updateSubtask(subtask3, 22);
+
         assertEquals("2 неделя  бег", subtask2.getName(), "Имя задачи не должно измениться");
         assertEquals("пробежать в сумме 80 км", subtask2.getDescription(),
                 "Описание задачи не должно измениться");
         assertEquals(Status.NEW, subtask2.getStatus(), "Статус не должен измениться");
+
         taskManager.updateSubtask(subtask3, 3);
+
         assertEquals("3 неделя  бег", subtask2.getName(), "Имя задачи  должно измениться");
         assertEquals("пробежать в сумме 100 км", subtask2.getDescription(),
                 "Описание задачи  должно измениться");
@@ -257,11 +316,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic epic2 = new Epic("Плавание", "Проплыть 100 км");
 
         taskManager.updateEpic(epic2, 22);
+
         assertEquals("Бег", epic.getName(), "Имя эпика не должно измениться");
         assertEquals("выполнить цель по км за месяц", epic.getDescription(),
                 "Описание эпика не должно измениться");
         assertEquals(Status.NEW, epic.getStatus(), "Статус эпика не должен измениться");
+
         taskManager.updateEpic(epic2, 1);
+
         assertEquals("Плавание", epic.getName(), "Имя эпика должно измениться");
         assertEquals("Проплыть 100 км", epic.getDescription(), "Описание эпика  должно измениться");
         assertEquals(Status.NEW, epic.getStatus(), "Статус эпика не должен измениться");
@@ -294,12 +356,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
         );
         subtask3.setStatus(Status.IN_PROGRESS);
         taskManager.updateSubtask(subtask3, 2);
+
         assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Cтатус эпика должен быть IN_PROGRESS");
         assertEquals(2, epic.getSubtaskIdList().get(0), "Эпик должен хранить id подзадачи");
+
         taskManager.deleteByIdSubtask(2);
         int size2 = taskManager.getAllSubtask().size();
+
         assertEquals(0, size2, "Cписок подзадач должен быть пуст");
         assertEquals(Status.NEW, epic.getStatus(), "Cтатус эпика должен быть NEW");
+
         assertTrue(epic.getSubtaskIdList().isEmpty(), "Эпик не должен хранить id подзадачи");
 
     }
@@ -312,13 +378,18 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 66, epic.getId());
         taskManager.createSubtask(subtask);
         taskManager.deleteByIdEpic(33);
+
         int size = taskManager.getAllEpic().size();
         int size2 = taskManager.getAllSubtask().size();
+
         assertEquals(1, size2, "Cписок подзадач должен быть без изменений");
         assertEquals(1, size, "Cписок эпиков должен быть без изменений");
+
         taskManager.deleteByIdEpic(1);
+
         int size3 = taskManager.getAllEpic().size();
         int size4 = taskManager.getAllSubtask().size();
+
         assertEquals(0, size4, "Cписок подзадач должен быть пуст");
         assertEquals(0, size3, "Cписок эпиков должен быть пуст");
 
@@ -334,6 +405,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(isEmpty, "Cписок подзадач должен быть пуст");
         taskManager.createSubtask(subtask);
         Subtask subtask2 = taskManager.getSubtaskByEpic(epic).get(0);
+
         assertEquals("2 неделя  бег", subtask2.getName(), "Имя не совпадает");
         assertEquals("пробежать в сумме 80 км", subtask2.getDescription(),
                 "Описание подзадачи не совпадает");
@@ -347,10 +419,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.getHistory();
         boolean isEmpty = taskManager.getHistory().isEmpty();
         assertTrue(isEmpty, "История просмотров задач должна быть пустая");
+
         Task task = new Task("Купить цветы", "Купить цветы девушке на др ", 99);
         Task task1 = new Task("Починить авто", "Съездить в сервис", 88);
+
         taskManager.createTask(task);
         taskManager.createTask(task1);
+
         //Создаем первый эпик и подзадачи для него
         Epic epic = new Epic("Бег", "выполнить цель по км за месяц ");
         taskManager.createEpic(epic);
@@ -366,7 +441,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         //создаем второй эпик без подзадач
         Epic epic2 = new Epic("Подтягивания", "Выполнить 20 подтягиваний за раз");
         taskManager.createEpic(epic2);
-        //тесты
         taskManager.getTaskById(task.getId());
         myHistoryList.add(task);
         taskManager.getTaskById(task1.getId());
@@ -395,10 +469,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.getEpicById(epic2.getId());
         myHistoryList.remove(epic2);
         taskManager.deleteByIdEpic(3);
+
         myHistoryList.remove(epic);
         myHistoryList.remove(subtask);
         myHistoryList.remove(subtask2);
         myHistoryList.remove(subtask3);
+
         myHistoryList.add(epic2);
         List<Task> list = taskManager.getHistory();
         assertEquals(myHistoryList, list, "Неверно отображается история просмотра задач");
@@ -415,17 +491,23 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(new Subtask("3 и 4 недели бег", "пробежать в сумме 80 км",
                 50, LocalDateTime.of(2022, 5, 22, 10, 22),
                 epic.getId()));
+
         taskManager.getSubtaskById(2);
         taskManager.getSubtaskById(3);
+
         int sizeTimeSet = taskManager.getPrioritizedTasks().size();
         int sizeHistoryList = taskManager.getHistory().size();
+
         boolean empty = taskManager.getAllSubtask().isEmpty();
+
         assertEquals(1, sizeTimeSet, "Неверно отображается количество подзадач во времени");
         assertFalse(empty, "При cозданных подзадачах список не должен быть пуст");
         assertEquals(1, sizeHistoryList, "Неверно отображается количество просмотренных подзадач");
+
         taskManager.deleteSubtasks();
         boolean empty2 = taskManager.getAllSubtask().isEmpty();
         int sizeHistoryList2 = taskManager.getHistory().size();
+
         assertTrue(empty2, "После вызова метода список подзадач должен быть пуст");
         assertEquals(0, sizeHistoryList2, "Количество просмотренных подзадач должно быть равно 0");
     }

@@ -32,6 +32,7 @@ public class EpicTest {
         int sizeSubtaskMap = taskManager.getAllSubtask().size();
         Status status = taskManager.getAllEpic().get(0).getStatus();
         int sizeSubtaskIdList = taskManager.getAllEpic().get(0).getSubtaskIdList().size();
+
         assertEquals(1, sizeEpicMap, "эпик отсутствует в списке созданных эпиков,либо он там не один");
         assertEquals(Status.NEW, status, "статус эпика должен быть NEW");
         assertEquals(0, sizeSubtaskIdList, "список id подзадач в эпике должен быть пустым");
@@ -46,6 +47,7 @@ public class EpicTest {
         int sizeSubtaskMap = taskManager.getAllSubtask().size();
         Status status = taskManager.getAllEpic().get(0).getStatus();
         int sizeSubtaskIdList = taskManager.getAllEpic().get(0).getSubtaskIdList().size();
+
         assertEquals(Status.NEW, status, "статус эпика должен быть NEW");
         assertEquals(2, sizeSubtaskIdList, "список id подзадач в эпике должен состоять из двух подзадач");
         assertEquals(2, sizeSubtaskMap, "список подзадач в менеджере должен состоять из двух подзадач");
@@ -58,13 +60,17 @@ public class EpicTest {
     public void testEpicWithSubtasksDoneDone() {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
+
         int sizeSubtaskMap = taskManager.getAllSubtask().size();
         int sizeSubtaskIdList = taskManager.getAllEpic().get(0).getSubtaskIdList().size();
+
         taskManager.updateSubtask(new Subtask("1 и 2 недели бег", "пробежать в сумме 60 км", Status.DONE,
                 2, 1), 2);
         taskManager.updateSubtask(new Subtask("3  неделя бега", "пробежать в сумме 80 км", Status.DONE,
                 3, 1), 3);
+
         Status status = taskManager.getAllEpic().get(0).getStatus();
+
         assertEquals(Status.DONE, status, "статус эпика должен быть DONE");
         assertEquals(2, sizeSubtaskIdList, "список id подзадач в эпике должен состоять из двух подзадач");
         assertEquals(2, sizeSubtaskMap, "список подзадач в менеджере должен состоять из двух подзадач");
@@ -76,13 +82,17 @@ public class EpicTest {
     public void testEpicWithSubtasksNewDone() {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
+
         int sizeSubtaskMap = taskManager.getAllSubtask().size();
         int sizeSubtaskIdList = taskManager.getAllEpic().get(0).getSubtaskIdList().size();
+
         taskManager.updateSubtask(new Subtask("1 и 2 недели бег", "пробежать в сумме 60 км", Status.NEW,
                 2, 1), 2);
         taskManager.updateSubtask(new Subtask("3  неделя бега", "пробежать в сумме 80 км", Status.DONE,
                 3, 1), 3);
+
         Status status = taskManager.getAllEpic().get(0).getStatus();
+
         assertEquals(Status.NEW, status, "статус эпика должен быть NEW");
         assertEquals(2, sizeSubtaskIdList, "список id подзадач в эпике должен состоять из двух подзадач");
         assertEquals(2, sizeSubtaskMap, "список подзадач в менеджере должен состоять из двух подзадач");
@@ -93,15 +103,19 @@ public class EpicTest {
     public void testEpicWithSubtasksIpIp() {
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
+
         int sizeSubtaskMap = taskManager.getAllSubtask().size();
         int sizeSubtaskIdList = taskManager.getAllEpic().get(0).getSubtaskIdList().size();
+
         taskManager.updateSubtask(new Subtask("1 и 2 недели бег", "пробежать в сумме 60 км",
                 Status.IN_PROGRESS,
                 2, 1), 2);
         taskManager.updateSubtask(new Subtask("3  неделя бега", "пробежать в сумме 80 км",
                 Status.IN_PROGRESS,
                 3, 1), 3);
+
         Status status = taskManager.getAllEpic().get(0).getStatus();
+
         assertEquals(Status.IN_PROGRESS, status, "статус эпика должен быть IN_PROGRESS");
         assertEquals(2, sizeSubtaskIdList, "список id подзадач в эпике должен состоять из двух подзадач");
         assertEquals(2, sizeSubtaskMap, "список подзадач в менеджере должен состоять из двух подзадач");

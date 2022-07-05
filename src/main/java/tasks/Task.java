@@ -9,8 +9,8 @@ public class Task implements Comparable<Task> {
     private int id;
     private Status status;
     private long duration;
-    private LocalDateTime starTime;
-    private LocalDateTime endTime=null;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     public Task(String name, String description) {
         this.name = name;
@@ -27,8 +27,8 @@ public class Task implements Comparable<Task> {
         this.name = name;
         this.description = description;
         this.duration = duration;
-        this.starTime = starTime;
-        this.endTime=getEndTime();
+        this.startTime = starTime;
+        this.endTime = getEndTime();
     }
 
     public Task(String name, String description, Status status, long duration) {
@@ -57,7 +57,7 @@ public class Task implements Comparable<Task> {
     }
 
     public void setStartTime(LocalDateTime starTime) {
-        this.starTime = starTime;
+        this.startTime = starTime;
     }
 
     public void setDuration(long duration) {
@@ -65,15 +65,15 @@ public class Task implements Comparable<Task> {
     }
 
     public LocalDateTime getEndTime() {
-        if (starTime == null) {
+        if (startTime == null) {
             return null;
         } else {
-            return starTime.plus(Duration.ofMinutes(getDuration()));
+            return startTime.plus(Duration.ofMinutes(getDuration()));
         }
     }
 
     public LocalDateTime getStartTime() {
-        return starTime;
+        return startTime;
     }
 
     public long getDuration() {
@@ -114,37 +114,52 @@ public class Task implements Comparable<Task> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Task)){
+            return false;
+        }
         Task task = (Task) o;
 
-        if (getId() != task.getId()) return false;
-        if (getDuration() != task.getDuration()) return false;
-        if (getName() != null ? !getName().equals(task.getName()) : task.getName() != null) return false;
-        if (getDescription() != null ? !getDescription().equals(task.getDescription()) : task.getDescription() != null)
+        if (getId() != task.getId()){
             return false;
-        if (getStatus() != task.getStatus()) return false;
-        if (starTime != null ? !starTime.equals(task.starTime) : task.starTime != null) return false;
+        }
+        if (getDuration() != task.getDuration()){
+            return false;
+        }
+        if (getName() != null ? !getName().equals(task.getName()) : task.getName() != null) {
+            return false;
+        }
+        if (getDescription() != null ? !getDescription().equals(task.getDescription()) : task.getDescription() != null){
+            return false;
+        }
+        if (getStatus() != task.getStatus()){
+            return false;
+        }
+        if (startTime != null ? !startTime.equals(task.startTime) : task.startTime != null){
+            return false;
+        }
         return getEndTime() != null ? getEndTime().equals(task.getEndTime()) : task.getEndTime() == null;
     }
 
     @Override
     public int hashCode() {
+        int primeNumber = 31;
         int result = getName().hashCode();
-        result = 31 * result + getDescription().hashCode();
-        result = 31 * result + getId();
-        result = 31 * result + getStatus().hashCode();
-        result = 31 * result + (int) (getDuration() ^ (getDuration() >>> 32));
-        result = 31 * result + starTime.hashCode();
-        result = 31 * result + getEndTime().hashCode();
+        result = primeNumber * result + getDescription().hashCode();
+        result = primeNumber * result + getId();
+        result = primeNumber * result + getStatus().hashCode();
+        result = primeNumber * result + (int) (getDuration() ^ (getDuration() >>> 32));
+        result = primeNumber * result + startTime.hashCode();
+        result = primeNumber * result + getEndTime().hashCode();
         return result;
     }
 
     @Override
     public String toString() {
-        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description+ ","+duration+ ","+starTime+ ","
-                +endTime+"\n";
+        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description + "," + duration + "," + startTime + ","
+                + endTime + "\n";
 
     }
 

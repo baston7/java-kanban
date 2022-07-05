@@ -173,10 +173,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 epic.setDuration(Long.parseLong(splitTasks[5]));
                 if (splitTasks[6].equals("null") && splitTasks[7].equals("null")) {
                     epic.setStartTime(null);
-                    epic.setEndTimeEpic(null);
+                    epic.setEndTime(null);
                 } else {
                     epic.setStartTime(LocalDateTime.parse(splitTasks[6]));
-                    epic.setEndTimeEpic(LocalDateTime.parse(splitTasks[7]));
+                    epic.setEndTime(LocalDateTime.parse(splitTasks[7]));
                 }
                 return epic;
             }

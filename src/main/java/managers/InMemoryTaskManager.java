@@ -33,21 +33,22 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
     }
+
     @Override
     public Set<Task> getPrioritizedTasks() {
         return timesSet;
     }
 
 
-
     @Override
     public Integer createTask(Task task) {  //метод создания задач
-        task.setId(generationId());
-        task.setStatus(Status.NEW);
-        task.setStartTime(task.getStartTime());
-        task.setDuration(task.getDuration());
-        boolean check=addTimesSet(task);
-        if(check) {
+        boolean check = checkTimesSet(task);
+        if (check) {
+            task.setId(generationId());
+            task.setStatus(Status.NEW);
+            task.setStartTime(task.getStartTime());
+            task.setDuration(task.getDuration());
+            timesSet.add(task);
             taskMap.put(task.getId(), task);
             return task.getId();
         }
@@ -58,12 +59,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Integer createSubtask(Subtask subtask) { //метод создания подзадач
         if (epicMap.containsKey(subtask.getEpicId())) {
-            boolean check=addTimesSet(subtask);
-            if(check){
-            subtask.setId(generationId());
-            subtask.setStatus(Status.NEW);
-            subtask.setDuration(subtask.getDuration());
-            subtask.setStartTime(subtask.getStartTime());
+            boolean check = checkTimesSet(subtask);
+            if (check) {
+                subtask.setId(generationId());
+                subtask.setStatus(Status.NEW);
+                subtask.setDuration(subtask.getDuration());
+                subtask.setStartTime(subtask.getStartTime());
+                timesSet.add(subtask);
                 subtaskMap.put(subtask.getId(), subtask);
                 Epic epic = epicMap.get(subtask.getEpicId());// достаем Эпик чтобы записать в него id подзадачи
                 epic.addIdSubtaskList(id);
@@ -102,7 +104,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTasks() { //метод удаления всех задач
-        for(Task task: taskMap.values()){
+        for (Task task : taskMap.values()) {
             historyManager.remove(task.getId());
             timesSet.remove(task);
         }
@@ -129,7 +131,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(id);
         }
         epicMap.clear();
-        for(Subtask subtask:subtaskMap.values()){
+        for (Subtask subtask : subtaskMap.values()) {
             historyManager.remove(subtask.getId());
             timesSet.remove(subtask);
         }
@@ -159,39 +161,32 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task newTask, int id) {  //метод обновления задачи
-        if (taskMap.containsKey(id)) {
+        if (taskMap.containsKey(id)&& checkTimesSet(newTask)) {
             Task task = taskMap.get(id);
             task.setName(newTask.getName());
             task.setDescription(newTask.getDescription());
             task.setStatus(newTask.getStatus());
             task.setDuration(newTask.getDuration());
             task.setStartTime(newTask.getStartTime());
-            boolean check=addTimesSet(task);
-            if(!check){
-                taskMap.remove(task.getId());
-            }
+            timesSet.add(task);
         }
     }
 
     @Override
     public void updateSubtask(Subtask newSubtask, int id) { //метод обновления подзадачи
-        if (subtaskMap.containsKey(id)) {
+        if (subtaskMap.containsKey(id)&&checkTimesSet(newSubtask)) {
             Subtask subtask = subtaskMap.get(id);
             subtask.setName(newSubtask.getName());
             subtask.setDescription(newSubtask.getDescription());
-            if (newSubtask.getStatus()!=null){
+            if (newSubtask.getStatus() != null) {
                 subtask.setStatus(newSubtask.getStatus());
             }
             subtask.setStartTime(newSubtask.getStartTime());
             subtask.setDuration(newSubtask.getDuration());
-            boolean check=addTimesSet(subtask);
-            if(check){
+            timesSet.add(subtask);
                 Epic epic = epicMap.get(subtask.getEpicId()); // проверяем и обновляем статус Эпика, если статус подзадачи изменился
                 epicUpdateStatus(epic);
                 epicUpdateTimes(epic);
-            }else{
-                subtaskMap.remove(subtask.getId());
-            }
         }
     }
 
@@ -295,40 +290,40 @@ public class InMemoryTaskManager implements TaskManager {
             long durationEpic = 0;
             LocalDateTime starTimeEpic = null;
             for (Subtask subtask : getSubtaskByEpic(epic)) {
-                if(subtask.getStartTime()!=null){
+                if (subtask.getStartTime() != null) {
                     starTimeEpic = subtask.getStartTime();
                     durationEpic += subtask.getDuration();
                     if (subtask.getStartTime().isBefore(starTimeEpic)) {
                         starTimeEpic = subtask.getStartTime();
                     }
+                } else if (subtask.getStartTime() == null) {
+                    durationEpic += subtask.getDuration();
                 }
                 epic.setDuration(durationEpic);
-
             }
             if (starTimeEpic != null) {
                 epic.setStartTime(starTimeEpic);
-                epic.setEndTimeEpic(starTimeEpic.plus(Duration.ofMinutes(durationEpic)));
+                epic.setEndTime(starTimeEpic.plus(Duration.ofMinutes(durationEpic)));
             }
         } else {
             epic.setStartTime(null);
-            epic.setEndTimeEpic(null);
+            epic.setEndTime(null);
         }
     }
-    private boolean addTimesSet(Task task) {
-        if(task!=null&&task.getStartTime()!=null){
-            for(Task task1:timesSet){
-                if(task1.getStartTime()!=null&&task.getStartTime().isBefore(task1.getStartTime())&&
-                        task.getEndTime().isAfter(task1.getStartTime())){
+
+    private boolean checkTimesSet(Task task) {
+        if (task != null && task.getStartTime() != null) {
+            for (Task task1 : timesSet) {
+                if (task1.getStartTime() != null && task.getStartTime().isBefore(task1.getStartTime()) &&
+                        task.getEndTime().isAfter(task1.getStartTime())) {
                     return false;
-                } else if(task1.getStartTime()!=null&&task.getStartTime().isBefore(task1.getEndTime())&&
-                        task.getEndTime().isAfter(task1.getStartTime())){
+                } else if (task1.getStartTime() != null && task.getStartTime().isBefore(task1.getEndTime()) &&
+                        task.getEndTime().isAfter(task1.getStartTime())) {
                     return false;
                 }
             }
-            timesSet.add(task);
             return true;
-        }else if(task!=null&&task.getStartTime()==null){
-            timesSet.add(task);
+        } else if (task != null && task.getStartTime() == null) {
             return true;
         }
         return false;
