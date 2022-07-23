@@ -1,9 +1,6 @@
 package utilits;
 
-import managers.HistoryManager;
-import managers.InMemoryHistoryManager;
-import managers.InMemoryTaskManager;
-import managers.TaskManager;
+import managers.*;
 
 public class Managers {
     public static TaskManager getDefault() {
@@ -12,5 +9,9 @@ public class Managers {
 
     public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
+    }
+
+    public static HTTPTaskManager getDefaultHTTP() {
+        return new HTTPTaskManager("http://localhost:8078");
     }
 }

@@ -12,10 +12,24 @@ import java.util.Set;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private File file;
+    private String fileName;
 
-    public FileBackedTasksManager(File file) {
-        if (file != null) {
-            this.file = file;
+
+    protected FileBackedTasksManager() {
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public FileBackedTasksManager(String fileName) {
+        if (fileName != null) {
+            this.fileName = fileName;
+            this.file = new File(fileName);
         }
     }
 
@@ -120,7 +134,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         save();
     }
 
-    private void save() {
+    protected void save() {
         try (FileWriter filewriter = new FileWriter(file)) {
             filewriter.write("id,type,name,status,description,epic,duration,StartTime,EndTime\n");
             for (Task task : getAllTask()) {
@@ -139,7 +153,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
     }
 
-    public static Task fromString(String value) {
+    protected static Task fromString(String value) {
         if (value != null && !value.isBlank() && !value.isEmpty()) {
             String[] splitTasks = value.split(",");
             if (TaskType.valueOf(splitTasks[1]).equals(TaskType.TASK)) {
@@ -211,7 +225,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     public static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager manager = new FileBackedTasksManager(file);
+        FileBackedTasksManager manager = new FileBackedTasksManager(file.getName());
         String result = "";
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {

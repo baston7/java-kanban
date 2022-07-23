@@ -1,13 +1,16 @@
 package tests;
 
 import managers.TaskManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import servers.KVServer;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +20,24 @@ import static org.junit.jupiter.api.Assertions.*;
 abstract class TaskManagerTest<T extends TaskManager> {
     public T taskManager;
     abstract T createTaskManager();
+    public KVServer server=createKVServer();
 
+
+    public KVServer createKVServer() {
+        try {
+            return new KVServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }return null;
+    }
     @BeforeEach
     public void updateTaskManager() {
+        server.start();
         taskManager = createTaskManager();
-        Task task23 = new Task("Купить цветы", "Купить цветы девушке на др ", 215,
-                LocalDateTime.of(2022, 11, 22, 10, 22));
+    }
+    @AfterEach
+    public void stopServer() {
+        server.stop();
     }
 
     @Test

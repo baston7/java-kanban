@@ -17,7 +17,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
 
     @Override
     FileBackedTasksManager createTaskManager() {
-        return new FileBackedTasksManager(new File("book2.csv"));
+        return new FileBackedTasksManager("book2.csv");
     }
 
     @Test
@@ -63,7 +63,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
 
     @Test
     public void testRecoverTasksTimes() {
-        FileBackedTasksManager backedTasksManager = new FileBackedTasksManager(new File("book.csv"));
+        FileBackedTasksManager backedTasksManager = new FileBackedTasksManager("book.csv");
         Task task = new Task("Купить цветы", "Купить цветы девушке на др ", 44);
         Task task1 = new Task("Починить авто", "Съездить в сервис", 33);
 
