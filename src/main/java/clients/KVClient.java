@@ -10,25 +10,24 @@ import java.net.http.HttpResponse;
 
 public class KVClient {
     private final String serverUrl;
-    private long API_TOKEN;
     private final HttpClient client = HttpClient.newHttpClient();
-
+    private long apiToken;
     public KVClient(String serverUrl) {
         this.serverUrl = serverUrl;
         registration();
     }
 
-    public long getAPI_TOKEN() {
-        return API_TOKEN;
+    public long getApiToken() {
+        return apiToken;
     }
 
-    public void setAPI_TOKEN(long API_TOKEN) {
-        this.API_TOKEN = API_TOKEN;
+    public void setApiToken(long apiToken) {
+        this.apiToken = apiToken;
     }
 
     private void registration() {
-        if (API_TOKEN != 0) {
-            System.out.println("Ваш API_TOKEN = " + API_TOKEN);
+        if (apiToken != 0) {
+            System.out.println("Ваш API_TOKEN = " + apiToken);
             return;
         }
         URI registrationUrl = URI.create(serverUrl + "/register");
@@ -41,18 +40,17 @@ public class KVClient {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JsonElement jsonElement = JsonParser.parseString(response.body());
-            API_TOKEN = jsonElement.getAsLong();
-            System.out.println("Ваш API_TOKEN = " + API_TOKEN);
+            apiToken = jsonElement.getAsLong();
+            System.out.println("Ваш API_TOKEN = " + apiToken);
 
         } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + registrationUrl +
-                    "', возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+            System.out.printf("Во время выполнения запроса ресурса по URL-адресу: %s возникла ошибка." +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.",registrationUrl);
         }
     }
 
     public void put(String key, String json) {
-        URI saveUrl = URI.create(serverUrl + "/save/" + key + "?API_TOKEN=" + API_TOKEN);
+        URI saveUrl = URI.create(serverUrl + "/save/" + key + "?API_TOKEN=" + apiToken);
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(saveUrl)
@@ -62,16 +60,15 @@ public class KVClient {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + saveUrl +
-                    "', возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+            System.out.printf("Во время выполнения запроса ресурса по URL-адресу: %s возникла ошибка." +
+                    "Проверьте, пожалуйста, адрес и повторите попытку.",saveUrl);
         }
     }
 
 
     public String load(String key) {
         String load = null;
-        URI loadUrl = URI.create(serverUrl + "/load/" + key + "?API_TOKEN=" + API_TOKEN);
+        URI loadUrl = URI.create(serverUrl + "/load/" + key + "?API_TOKEN=" + apiToken);
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(loadUrl)

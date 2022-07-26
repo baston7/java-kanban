@@ -32,7 +32,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
 
     //для тестов создаем класс чтобы было удобно восстанавливать менеджер
     public long forTestGetApi() {
-        return client.getAPI_TOKEN();
+        return client.getApiToken();
     }
 
     @Override
@@ -72,13 +72,13 @@ public class HTTPTaskManager extends FileBackedTasksManager {
 
     public void recoverManager(long API_TOKEN) {
         //необходимо восстановить токен тк, подразумевается что менеджер новый
-        client.setAPI_TOKEN(API_TOKEN);
+        client.setApiToken(API_TOKEN);
 
         String tasks = client.load("tasks");
         if (tasks != null) {
-            Type type = new TypeToken<List<Task>>() {
+            Type taskType = new TypeToken<List<Task>>() {
             }.getType();
-            List<Task> tasksList = gson.fromJson(tasks, type);
+            List<Task> tasksList = gson.fromJson(tasks, taskType);
             //восстанавливаем задачи,
             for (Task task : tasksList) {
                 addRecoverTask(task);
@@ -89,9 +89,9 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         String subtasks = client.load("subtasks");
         if (subtasks != null) {
 
-            Type type2 = new TypeToken<List<Subtask>>() {
+            Type subtaskType = new TypeToken<List<Subtask>>() {
             }.getType();
-            List<Subtask> subtasksList = gson.fromJson(subtasks, type2);
+            List<Subtask> subtasksList = gson.fromJson(subtasks, subtaskType);
             for (Subtask subtask : subtasksList) {
                 addRecoverTask(subtask);
             }
@@ -99,9 +99,9 @@ public class HTTPTaskManager extends FileBackedTasksManager {
 
         String epics = client.load("epics");
         if (epics != null) {
-            Type type3 = new TypeToken<List<Epic>>() {
+            Type epicType = new TypeToken<List<Epic>>() {
             }.getType();
-            List<Epic> epicsList = gson.fromJson(epics, type3);
+            List<Epic> epicsList = gson.fromJson(epics, epicType);
             for (Epic epic : epicsList) {
                 addRecoverTask(epic);
             }
@@ -109,9 +109,9 @@ public class HTTPTaskManager extends FileBackedTasksManager {
 
         String historyID = client.load("history");
         if (historyID != null) {
-            Type type4 = new TypeToken<List<Integer>>() {
+            Type historyType = new TypeToken<List<Integer>>() {
             }.getType();
-            List<Integer> historyIdList = gson.fromJson(historyID, type4);
+            List<Integer> historyIdList = gson.fromJson(historyID, historyType);
             //восстанавливаем историю просмотров
             for (Integer id : historyIdList) {
                 getTaskById(id);

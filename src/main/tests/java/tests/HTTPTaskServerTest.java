@@ -28,33 +28,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTTPTaskServerTest {
     //сначала создаем KVServer, запускаем его и только потом создаем и запускаем наш сервер для обработки запросов
-    KVServer dataServer = createKVServer();
-    HttpTaskServer httpServer;
-    HTTPTaskManager manager;
+    private KVServer dataServer;
+    private HttpTaskServer httpServer;
+    private HTTPTaskManager manager;
 
     private final Gson gson = new GsonBuilder()
             .create();
 
-    public KVServer createKVServer() {
-        try {
-            return new KVServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private KVServer createKVServer() throws IOException {
+        return new KVServer();
     }
 
-    public HttpTaskServer createHttpTaskServer() {
-        try {
-            return new HttpTaskServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private HttpTaskServer createHttpTaskServer() throws IOException {
+        return new HttpTaskServer();
     }
 
     @BeforeEach
     public void updateTaskManager() throws IOException {
+        dataServer = createKVServer();
         dataServer.start();
         httpServer = createHttpTaskServer();
         httpServer.start();
